@@ -1,0 +1,16 @@
+# emacs related ignores
+*#*#
+*.#*#
+.#*
+*~
+
+# git related ignores
+*.rej
+*.orig
+.git-module-status
+
+# python related ignores
+__pycache__/
+
+.git
+.idea
