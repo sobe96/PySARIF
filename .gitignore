@@ -12,5 +12,7 @@
 # python related ignores
 __pycache__/
 
-.git
-.idea
+.git/
+.idea/
+
+issues_output.csv
