@@ -15,4 +15,4 @@ __pycache__/
 .git/
 .idea/
 
-issues_output.csv
+*.csv
