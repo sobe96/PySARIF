@@ -2,6 +2,7 @@ import file_reader
 import data_analysis
 import dataframe_manager
 import utils
+import cli_interface
 
 def main():
     file_path = 'data/5.10/svace-res.sarif'
@@ -29,4 +30,4 @@ def main():
     utils.save_csv(issues_df)
 
 if __name__ == "__main__":
-    main()
+    cli_interface.main_menu()
