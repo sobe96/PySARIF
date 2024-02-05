@@ -18,7 +18,10 @@ def associate_rules(df1, df2, output_path):
     common = pd.merge(df1, df2, on='unique_location')
 
     # Extracting rule association
-    rule_association = common[['Rule ID_x', 'Message_x', 'Rule ID_y', 'Message_y']].drop_duplicates(subset=['Rule ID_x', 'Rule ID_y'])
-    rule_association.to_csv(f"{output_path}/rule_association.csv", index=False)
+    rule_association = common[['Rule ID_x', 'Rule ID_y']].drop_duplicates(subset=['Rule ID_x', 'Rule ID_y'])
+    rule_association.to_csv(f"{output_path}/rule_association.csv", mode="a", header=False, index=False)
+    df = pd.read_csv(f"{output_path}/rule_association.csv")
+    df = df.drop_duplicates()
+    df.to_csv(f"{output_path}/rule_association.csv", index=False)
 
     print("Rule association results saved to file.")
