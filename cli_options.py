@@ -5,11 +5,15 @@ import utils
 import simple_comparison
 import advanced_comparison
 import rule_association
+import tkinter as tk
+from tkinter import filedialog
+
+
 
 
 def load_sarif_file(sarif_dataframes):
-    global file_path
-    file_path = input("Enter the path to the SARIF file: ")
+    # global file_path
+    # file_path = input("Enter the path to the SARIF file: ")
     file_name = utils.get_file_name_without_extension(file_path)
     sarif_data = file_reader.read_sarif_file(file_path)
     global parsed_issues
@@ -21,6 +25,16 @@ def load_sarif_file(sarif_dataframes):
     for prefix in prefixes:
         sarif_dataframes[file_name] = utils.remove_specific_prefix(sarif_dataframes[file_name], 'File Location', prefix)
     print("File loaded successfully:")
+
+
+def select_sarif_gui(sarif_dataframes):
+    global file_path
+    root = tk.Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename(filetypes=[("SARIF files", "*.sarif")])
+    if file_path:
+        print(f'Loading {file_path}...')
+        load_sarif_file(sarif_dataframes)
 
 
 def analyze_data(sarif_dataframes):

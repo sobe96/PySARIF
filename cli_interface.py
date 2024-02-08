@@ -15,7 +15,7 @@ def main_menu():
         choice = input("Enter your choice: ")
 
         if choice == '1':
-            cli_options.load_sarif_file(sarif_dataframes)
+            cli_options.select_sarif_gui(sarif_dataframes)
         elif choice == '2':
             cli_options.analyze_data(sarif_dataframes)
         elif choice == '3':

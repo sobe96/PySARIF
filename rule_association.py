@@ -1,5 +1,6 @@
 # rule_association.py
 import pandas as pd
+import os
 
 
 def associate_rules(df1, df2, output_path, filename1, filename2):
@@ -9,12 +10,14 @@ def associate_rules(df1, df2, output_path, filename1, filename2):
         df1 (pd.DataFrame): DataFrame for the first SARIF file.
         df2 (pd.DataFrame): DataFrame for the second SARIF file.
         output_path (str): Path to save the output file.
+        filename1 (str): Name of first file.
+        filename2 (str): Name of second file.
     """
     # Count rule occurrences in each DataFrame before merge
     rule_counts_df1 = df1['Rule ID'].value_counts().reset_index().rename(
-        columns={'index': f'Rule ID_{filename1}', 'Rule ID': f'Initial_count_{filename1}'})
+        columns={'Rule ID': f'Rule ID_{filename1}', 'count': f'Initial_count_{filename1}'})
     rule_counts_df2 = df2['Rule ID'].value_counts().reset_index().rename(
-        columns={'index': f'Rule ID_{filename2}', 'Rule ID': f'Initial_count_{filename2}'})
+        columns={'Rule ID': f'Rule ID_{filename2}', 'count': f'Initial_count_{filename2}'})
 
     # Assuming 'Rule ID' and 'Description' columns exist in the DataFrames
     # Modify as per your DataFrame structure
@@ -22,11 +25,13 @@ def associate_rules(df1, df2, output_path, filename1, filename2):
     df2['unique_location'] = df2['File Location'] + ':' + df2['Start Line'].astype(str)
 
     # Merge on unique location to find common issues
-    common = pd.merge(df1, df2, on='unique_location', suffixes=(f'_{filename1}',f'_{filename2}'))
+    common = pd.merge(df1, df2, on='unique_location', suffixes=(f'_{filename1}', f'_{filename2}'))
 
     # Extracting rule association
     duplicates_count = common.groupby([f'Rule ID_{filename1}', f'Rule ID_{filename2}']).size().reset_index(
         name=f'Mutual_count_{filename1}_and_{filename2}')
+    print(duplicates_count[f'Rule ID_{filename1}'])
+    print(rule_counts_df1)
 
     detailed_summary = pd.merge(duplicates_count, rule_counts_df1, on=f'Rule ID_{filename1}', how='left')
     detailed_summary = pd.merge(detailed_summary, rule_counts_df2, on=f'Rule ID_{filename2}', how='left')
@@ -35,11 +40,15 @@ def associate_rules(df1, df2, output_path, filename1, filename2):
         subset=[f'Rule ID_{filename1}', f'Rule ID_{filename2}'])
 
     # Save rule association
-    rule_association.to_csv(f"{output_path}/rule_association_{filename1}_{filename2}.csv",
-                            mode="a", index=False)
-    df = pd.read_csv(f"{output_path}/rule_association_{filename1}_{filename2}.csv")
+    savefile = f"{output_path}/rule_association_{filename1}_{filename2}.csv"
+    file_exists = os.path.exists(savefile)
+    if file_exists:
+        rule_association.to_csv(savefile, mode="a", header=False, index=False)
+    else:
+        rule_association.to_csv(savefile, mode="a", header=True, index=False)
+    df = pd.read_csv(savefile)
     df = df.drop_duplicates()
-    df.to_csv(f"{output_path}/rule_association_{filename1}_{filename2}.csv", index=False)
+    df.to_csv(savefile, index=False)
 
     detailed_summary.to_csv(f"{output_path}/detailed_summary_{filename1}_{filename2}.csv", index=False)
 
