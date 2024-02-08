@@ -1,7 +1,7 @@
 # advanced_comparison.py
 import pandas as pd
 
-def compare_advanced(df1, df2, output_path):
+def compare_advanced(df1, df2, output_path, filename1, filename2):
     """Perform an advanced comparison between two SARIF DataFrames and output results to files.
 
     Args:
@@ -13,13 +13,13 @@ def compare_advanced(df1, df2, output_path):
     df2['unique_location'] = df2['File Location'] + ':' + df2['Start Line'].astype(str)
 
     # Identify common and unique elements
-    common = pd.merge(df1, df2, on='unique_location')
+    common = pd.merge(df1, df2, on='unique_location', suffixes=(f'_{filename1}',f'_{filename2}'))
     unique_to_df1 = df1[~df1['unique_location'].isin(common['unique_location'])].drop_duplicates(subset=["Rule ID"])
     unique_to_df2 = df2[~df2['unique_location'].isin(common['unique_location'])].drop_duplicates(subset=["Rule ID"])
 
     # Output to files
-    common.to_csv(f"{output_path}/common_issues.csv", index=False)
-    unique_to_df1.to_csv(f"{output_path}/unique_to_df1_issues.csv", index=False)
-    unique_to_df2.to_csv(f"{output_path}/unique_to_df2_issues.csv", index=False)
+    common.to_csv(f"{output_path}/common_issues_of_{filename1}_{filename2}.csv", index=False)
+    unique_to_df1.to_csv(f"{output_path}/unique_{filename1}_issues.csv", index=False)
+    unique_to_df2.to_csv(f"{output_path}/unique_{filename2}_issues.csv", index=False)
 
     print("Advanced comparison results saved to files.")

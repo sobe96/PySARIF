@@ -65,7 +65,7 @@ def compare_sarif_files(sarif_dataframes):
     # Call to simple comparison function
     elif choice == '2':
         output_path = "outputs"  # Set your output directory
-        advanced_comparison.compare_advanced(sarif_dataframes[file1], sarif_dataframes[file2], output_path)
-        rule_association.associate_rules(sarif_dataframes[file1], sarif_dataframes[file2], output_path)
+        advanced_comparison.compare_advanced(sarif_dataframes[file1], sarif_dataframes[file2], output_path, file1, file2)
+        rule_association.associate_rules(sarif_dataframes[file1], sarif_dataframes[file2], output_path, file1, file2)
 
     # Call to advanced comparison function
