@@ -6,6 +6,7 @@ import simple_comparison
 import advanced_comparison
 import rule_association
 
+
 def load_sarif_file(sarif_dataframes):
     global file_path
     file_path = input("Enter the path to the SARIF file: ")
@@ -41,6 +42,7 @@ def save_data(sarif_dataframes):
         utils.save_csv(df, file_name)
         print(f"Saved successfully as {file_name}.csv")
 
+
 def compare_sarif_files(sarif_dataframes):
     if len(sarif_dataframes) < 2:
         print("At least two SARIF files are required for comparison.")
@@ -65,7 +67,8 @@ def compare_sarif_files(sarif_dataframes):
     # Call to simple comparison function
     elif choice == '2':
         output_path = "outputs"  # Set your output directory
-        advanced_comparison.compare_advanced(sarif_dataframes[file1], sarif_dataframes[file2], output_path, file1, file2)
+        advanced_comparison.compare_advanced(sarif_dataframes[file1], sarif_dataframes[file2], output_path, file1,
+                                             file2)
         rule_association.associate_rules(sarif_dataframes[file1], sarif_dataframes[file2], output_path, file1, file2)
 
     # Call to advanced comparison function

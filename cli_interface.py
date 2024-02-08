@@ -2,6 +2,8 @@
 import cli_options
 
 sarif_dataframes = {}
+
+
 def main_menu():
     while True:
         print("\nPySarif Engineer")
@@ -25,6 +27,7 @@ def main_menu():
             break
         else:
             print("Invalid choice. Please try again.")
+
 
 if __name__ == '__main__':
     main_menu()

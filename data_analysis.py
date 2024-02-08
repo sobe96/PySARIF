@@ -1,9 +1,8 @@
 # data_analysis.py
 from collections import Counter
-import json
-import pandas as pd
 # data_analysis.py
 import pandas as pd
+
 
 def summarize_issues(issues_df):
     """Summarize issues from a Pandas DataFrame.

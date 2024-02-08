@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def create_issues_dataframe(sarif_data):
     """Create a DataFrame from issues in the SARIF data."""
     if not sarif_data:
@@ -17,7 +18,8 @@ def create_issues_dataframe(sarif_data):
                 "Severity": result.get("level", "Unknown"),
                 "Rule ID": result.get("ruleId", "Unknown"),
                 "Message": result.get("message", {}).get("text", "No Message"),
-                "File Location": result.get("locations", [{}])[0].get("physicalLocation", {}).get("artifactLocation", {}).get(
+                "File Location": result.get("locations", [{}])[0].get("physicalLocation", {}).get("artifactLocation",
+                                                                                                  {}).get(
                     "uri", "Unknown"),
                 "Start Line": result.get("locations", [{}])[0].get("physicalLocation", {}).get("region", {}).get(
                     "startLine", -1)
@@ -26,5 +28,3 @@ def create_issues_dataframe(sarif_data):
             issues_list.append(issue)
 
     return pd.DataFrame(issues_list)
-
-

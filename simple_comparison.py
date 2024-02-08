@@ -1,6 +1,7 @@
 # simple_comparison.py
 import pandas as pd
 
+
 def compare_simple(df1, df2):
     """Perform a simple comparison between two SARIF DataFrames.
 

@@ -1,6 +1,7 @@
 # file_reader.py
 import json
 
+
 def read_sarif_file(file_path):
     """Read and parse a SARIF file.
 

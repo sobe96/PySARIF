@@ -1,6 +1,8 @@
 import pandas as pd
 from collections import Counter
 import os
+
+
 def get_common_prefixes(df, file_path_column, depth):
     """Find the most common prefixes in file paths up to a specified depth."""
     # Split each path and take the first 'depth' parts
@@ -13,6 +15,7 @@ def get_common_prefixes(df, file_path_column, depth):
     most_common = prefix_counts.most_common()
 
     return most_common
+
 
 def remove_specific_prefix(df, file_path_column, prefix):
     """Remove a specific prefix from file paths in the DataFrame."""
@@ -28,6 +31,7 @@ def remove_specific_prefix(df, file_path_column, prefix):
     df[file_path_column] = df[file_path_column].apply(trim_prefix)
     return df
 
+
 def check_duplicates(df):
     duplicate_rows = df.duplicated()
 
@@ -39,6 +43,7 @@ def check_duplicates(df):
     if num_duplicates > 0:
         print("Duplicate Rows:")
         print(df[duplicate_rows])
+
 
 def get_file_name_without_extension(file_path):
     """Get the file name without extension from a file path.
@@ -52,6 +57,7 @@ def get_file_name_without_extension(file_path):
     base_name = os.path.basename(file_path)  # Extracts the file name with extension
     file_name_without_extension = os.path.splitext(base_name)[0]  # Splits the extension and takes the name part
     return file_name_without_extension
+
 
 def save_csv(df, file_name):
     df.to_csv(f"{file_name}.csv", index=False)

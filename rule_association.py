@@ -27,14 +27,9 @@ def associate_rules(df1, df2, output_path, filename1, filename2):
     # Extracting rule association
     duplicates_count = common.groupby([f'Rule ID_{filename1}', f'Rule ID_{filename2}']).size().reset_index(
         name=f'Mutual_count_{filename1}_and_{filename2}')
-    duplicates_summary = duplicates_count[[f'Rule ID_{filename1}', f'Rule ID_{filename2}',
-                                           f'Mutual_count_{filename1}_and_{filename2}']]
 
     detailed_summary = pd.merge(duplicates_count, rule_counts_df1, on=f'Rule ID_{filename1}', how='left')
     detailed_summary = pd.merge(detailed_summary, rule_counts_df2, on=f'Rule ID_{filename2}', how='left')
-
-    print(duplicates_summary)
-    print(detailed_summary)
 
     rule_association = common[[f'Rule ID_{filename1}', f'Rule ID_{filename2}']].drop_duplicates(
         subset=[f'Rule ID_{filename1}', f'Rule ID_{filename2}'])
@@ -46,12 +41,6 @@ def associate_rules(df1, df2, output_path, filename1, filename2):
     df = df.drop_duplicates()
     df.to_csv(f"{output_path}/rule_association_{filename1}_{filename2}.csv", index=False)
 
-    detailed_summary.to_csv(f"{output_path}/detailed_summary_{filename1}_{filename2}.csv",
-                            #mode="a",
-                            #header=False,
-                            index=False)
-    #df = pd.read_csv(f"{output_path}/detailed_summary_{filename1}_{filename2}.csv")
-    #df = df.drop_duplicates(subset=[f'Rule ID_{filename1}', f'Rule ID_{filename2}'])
-    #df.to_csv(f"{output_path}/detailed_summary_{filename1}_{filename2}.csv", index=False)
+    detailed_summary.to_csv(f"{output_path}/detailed_summary_{filename1}_{filename2}.csv", index=False)
 
     print("Rule association results saved to file.")
