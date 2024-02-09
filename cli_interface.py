@@ -1,28 +1,31 @@
 # cli_interface.py
 import cli_options
 
-sarif_dataframes = {}
+dataframes = {}
 
 
 def main_menu():
     while True:
         print("\nPySarif Engineer")
         print("1. Load SARIF File as Pandas DataFrame")
-        print("2. Analyze Data")
-        print("3. Save DataFrame as .csv")
-        print("4. Compare SARIF Files")
-        print("5. Exit")
+        print("2. Load Svace CSV File as Pandas DataFrame")
+        print("3. Analyze Data")
+        print("4. Save DataFrame as .csv")
+        print("5. Compare SARIF Files")
+        print("6. Exit")
         choice = input("Enter your choice: ")
 
         if choice == '1':
-            cli_options.select_sarif_gui(sarif_dataframes)
+            cli_options.gui_select(dataframes, 'sarif')
         elif choice == '2':
-            cli_options.analyze_data(sarif_dataframes)
+            cli_options.gui_select(dataframes, 'csv')
         elif choice == '3':
-            cli_options.save_data(sarif_dataframes)
+            cli_options.analyze_data(dataframes)
         elif choice == '4':
-            cli_options.compare_sarif_files(sarif_dataframes)
+            cli_options.save_data(dataframes)
         elif choice == '5':
+            cli_options.compare_sarif_files(dataframes)
+        elif choice == '6':
             print("Exiting...")
             break
         else:

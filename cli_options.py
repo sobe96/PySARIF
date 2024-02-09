@@ -1,3 +1,4 @@
+import file_hierarchy
 import file_reader
 import dataframe_manager
 import data_analysis
@@ -16,26 +17,37 @@ def load_sarif_file(sarif_dataframes):
     # file_path = input("Enter the path to the SARIF file: ")
     file_name = utils.get_file_name_without_extension(file_path)
     sarif_data = file_reader.read_sarif_file(file_path)
-    global parsed_issues
-    sarif_dataframes[file_name] = dataframe_manager.create_issues_dataframe(sarif_data)
-    prefixes = [
-        "file:///sast/packages-to-analyze/linux-astra-modules-5.10/linux-astra-modules-5.10-5.10.190",
-        "file:///"
-    ]
-    for prefix in prefixes:
-        sarif_dataframes[file_name] = utils.remove_specific_prefix(sarif_dataframes[file_name], 'File Location', prefix)
+    sarif_dataframes[file_name] = dataframe_manager.create_sarif_dataframe(sarif_data)
+    #prefixes = [
+    #    "file:///sast/packages-to-analyze/linux-astra-modules-5.10/linux-astra-modules-5.10-5.10.190",
+    #    "file:///"
+    #]
+    #for prefix in prefixes:
+    #    sarif_dataframes[file_name] = utils.remove_specific_prefix(sarif_dataframes[file_name], 'File Location', prefix)
+
+    file_hierarchy.build_and_print_hierarchy(sarif_dataframes[file_name])
     print("File loaded successfully:")
 
 
-def select_sarif_gui(sarif_dataframes):
+def load_csv_file(dataframes):
+    file_name = utils.get_file_name_without_extension(file_path)
+    csv_data = file_reader.read_csv_file(file_path)
+    dataframes[file_name] = dataframe_manager.create_csv_dataframe(csv_data)
+    file_hierarchy.build_and_print_hierarchy(dataframes[file_name])
+    print("File loaded successfully:")
+
+
+def gui_select(dataframes, extension):
     global file_path
     root = tk.Tk()
     root.withdraw()
-    file_path = filedialog.askopenfilename(filetypes=[("SARIF files", "*.sarif")])
+    file_path = filedialog.askopenfilename(filetypes=[("DATA files", f"*.{extension}")])
     if file_path:
         print(f'Loading {file_path}...')
-        load_sarif_file(sarif_dataframes)
-
+        if extension == 'sarif':
+            load_sarif_file(dataframes)
+        elif extension == 'csv':
+            load_csv_file(dataframes)
 
 def analyze_data(sarif_dataframes):
     for file_name, df in sarif_dataframes.items():

@@ -30,8 +30,6 @@ def associate_rules(df1, df2, output_path, filename1, filename2):
     # Extracting rule association
     duplicates_count = common.groupby([f'Rule ID_{filename1}', f'Rule ID_{filename2}']).size().reset_index(
         name=f'Mutual_count_{filename1}_and_{filename2}')
-    print(duplicates_count[f'Rule ID_{filename1}'])
-    print(rule_counts_df1)
 
     detailed_summary = pd.merge(duplicates_count, rule_counts_df1, on=f'Rule ID_{filename1}', how='left')
     detailed_summary = pd.merge(detailed_summary, rule_counts_df2, on=f'Rule ID_{filename2}', how='left')
