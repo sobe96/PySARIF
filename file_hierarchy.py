@@ -1,24 +1,18 @@
-import pandas as pd
-from collections import defaultdict
-
-
 def build_and_print_hierarchy(df):
-    hierarchy = {'_subfolders': {}, '_files': []}  # Root of the hierarchy
+    hierarchy = {'_subfolders': {}, '_files': []}
 
     for file_location in df['File Location']:
-        path_parts = file_location.split('/')  # Split the file path
+        path_parts = [part for part in file_location.split('/') if part]  # Avoid empty parts
         current = hierarchy
+        for part in path_parts[:-1]:
+            current = current.setdefault('_subfolders', {}).setdefault(part, {'_subfolders': {}, '_files': []})
+        current['_files'].append(path_parts[-1])
 
-        for part in path_parts[:-1]:  # Traverse and build the hierarchy for directories
-            if part not in current['_subfolders']:
-                current['_subfolders'][part] = {'_subfolders': {}, '_files': []}
-            current = current['_subfolders'][part]
-
-        current['_files'].append(path_parts[-1])  # Add the file to the list in the deepest directory
-
-    def print_hierarchy(node, indent=""):
-        for folder, content in node['_subfolders'].items():
-            print(f"{indent}{folder}/ ({len(content['_files'])})")
-            print_hierarchy(content, indent + "    ")
-
+    def print_hierarchy(node, prefix=""):
+        children = list(node['_subfolders'].items())
+        for i, (name, subnode) in enumerate(children, 1):
+            connector = "└── " if i == len(children) else "├── "
+            print(f"{prefix}{connector}{name}/ ({len(subnode['_files'])})")
+            extension = "    " if i == len(children) else "│   "
+            print_hierarchy(subnode, prefix=prefix+extension)
     print_hierarchy(hierarchy)

@@ -6,6 +6,7 @@ import utils
 import simple_comparison
 import advanced_comparison
 import rule_association
+import manual_trim
 import tkinter as tk
 from tkinter import filedialog
 
@@ -26,6 +27,7 @@ def load_sarif_file(sarif_dataframes):
     #    sarif_dataframes[file_name] = utils.remove_specific_prefix(sarif_dataframes[file_name], 'File Location', prefix)
 
     file_hierarchy.build_and_print_hierarchy(sarif_dataframes[file_name])
+    #manual_trim.manual_trim_paths(sarif_dataframes[file_name])
     print("File loaded successfully:")
 
 
@@ -34,6 +36,7 @@ def load_csv_file(dataframes):
     csv_data = file_reader.read_csv_file(file_path)
     dataframes[file_name] = dataframe_manager.create_csv_dataframe(csv_data)
     file_hierarchy.build_and_print_hierarchy(dataframes[file_name])
+    #manual_trim.manual_trim_paths((dataframes[file_name]))
     print("File loaded successfully:")
 
 
@@ -57,6 +60,27 @@ def analyze_data(sarif_dataframes):
         analysis_results = data_analysis.summarize_issues(df)
         print(f"Analysis Results for {file_name}:")
         print(analysis_results)
+
+def trim_dataframes(dataframes):
+    if len(dataframes) < 2:
+        print("At least two SARIF files are required for comparison.")
+        return
+
+    print("Select two SARIF files for comparison.")
+    print("Available files:", list(dataframes.keys()))
+    file1 = input("Enter the name of the first SARIF file: ")
+    file2 = input("Enter the name of the second SARIF file: ")
+
+    if file1 not in dataframes or file2 not in dataframes:
+        print("One or both SARIF files not found.")
+        return
+
+    file_hierarchy.build_and_print_hierarchy(dataframes[file1])
+    file_hierarchy.build_and_print_hierarchy(dataframes[file2])
+    print(f'Trimming {file1}')
+    dataframes[file1] = manual_trim.manual_trim_paths(dataframes[file1], file1)
+    print(f'Trimming {file2}')
+    dataframes[file2] = manual_trim.manual_trim_paths(dataframes[file2], file2)
 
 
 def save_data(sarif_dataframes):
