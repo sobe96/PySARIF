@@ -14,6 +14,7 @@ def remove_prefix_and_parents(df, prefix):
     for file_location in df['File Location']:
         if prefix in file_location:
             # Split the path and prefix into segments
+            #path_segments = file_location.replace(':', '/').split('/')
             path_segments = file_location.split('/')
             prefix_segments = prefix.split('/')
 
@@ -41,7 +42,7 @@ def manual_trim_paths(df, filename):
     """
     while True:
         print(f"\nCurrent path structure of {filename}:")
-        file_hierarchy.build_and_print_hierarchy(df)
+        df = file_hierarchy.build_and_print_hierarchy(df)
 
         # Ask the user for the prefix to trim
         prefix_to_trim = input(
@@ -53,6 +54,6 @@ def manual_trim_paths(df, filename):
         df = remove_prefix_and_parents(df, prefix_to_trim)
 
     print(f"\nFinal trimmed path structure of {filename}:")
-    file_hierarchy.build_and_print_hierarchy(df)
+    df = file_hierarchy.build_and_print_hierarchy(df)
 
     return df

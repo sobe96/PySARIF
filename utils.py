@@ -27,7 +27,6 @@ def remove_specific_prefix(df, file_path_column, prefix):
         if path.startswith(prefix):
             return path.replace(prefix, '/', 1)  # Replace the first occurrence only
         return path
-
     df[file_path_column] = df[file_path_column].apply(trim_prefix)
     return df
 
@@ -59,5 +58,5 @@ def get_file_name_without_extension(file_path):
     return file_name_without_extension
 
 
-def save_csv(df, file_name):
-    df.to_csv(f"{file_name}.csv", index=False)
+def save_csv(df, file_name, path):
+    df.to_csv(f"{path}/{file_name}.csv", index=False)
