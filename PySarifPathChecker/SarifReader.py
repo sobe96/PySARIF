@@ -1,8 +1,24 @@
 import os
 import json
 import glob
+import argparse
+
 
 def process_sarif_file(filepath, project_name):
+
+    def clean_uri(uri, project_name, project_index):
+        if project_index != -1:
+            uri = '/' + uri[project_index:]
+        # Убираем 'file://' в начале
+        if uri.startswith('file://'):
+            uri = uri[7:]
+        # Добавляем '/' в начале, если нет
+        if not uri.startswith('/'):
+            uri = '/' + uri
+        if not uri.startswith(f'/{project_name}'):
+            uri = f'/{project_name}' + uri
+        return uri
+
     with open(filepath, 'r', encoding='utf-8') as file:
         data = json.load(file)
 
@@ -16,17 +32,8 @@ def process_sarif_file(filepath, project_name):
                             if 'physicalLocation' in location and 'artifactLocation' in location['physicalLocation']:
                                 uri = location['physicalLocation']['artifactLocation'].get('uri', '')
                                 project_index = uri.find(project_name)
-                                if project_index != -1:
-                                    location['physicalLocation']['artifactLocation']['uri'] = '/' + uri[project_index:]
-                                if location['physicalLocation']['artifactLocation']['uri'].startswith('file://'):
-                                    location['physicalLocation']['artifactLocation']['uri'] = location['physicalLocation']['artifactLocation']['uri'][7:]
-                                if not (location['physicalLocation']['artifactLocation']['uri'].startswith('/')):
-                                    location['physicalLocation']['artifactLocation']['uri'] = '/' + location['physicalLocation']['artifactLocation']['uri']
-                                if not location['physicalLocation']['artifactLocation'][
-                                    'uri'].startswith(f'/{project_name}'):
-                                    location['physicalLocation']['artifactLocation'][
-                                        'uri'] = f'/{project_name}' + location['physicalLocation']['artifactLocation'][
-                                        'uri']
+                                uri = clean_uri(uri, project_name, project_index)
+                                location['physicalLocation']['artifactLocation'] = uri
 
                     if 'codeFlows' in result:
                         for code_flow in result['codeFlows']:
@@ -40,56 +47,23 @@ def process_sarif_file(filepath, project_name):
                                                         if 'physicalLocation' in loc and 'artifactLocation' in loc['physicalLocation']:
                                                             uri = loc['physicalLocation']['artifactLocation'].get('uri', '')
                                                             project_index = uri.find(project_name)
-                                                            if project_index != -1:
-                                                                loc['physicalLocation']['artifactLocation']['uri'] = '/' + uri[project_index:]
-                                                            if loc['physicalLocation']['artifactLocation'][
-                                                                'uri'].startswith('file://'):
-                                                                loc['physicalLocation']['artifactLocation'][
-                                                                    'uri'] = \
-                                                                loc['physicalLocation']['artifactLocation']['uri'][
-                                                                7:]
-                                                            if not (loc['physicalLocation']['artifactLocation'][
-                                                                'uri'].startswith('/')):
-                                                                loc['physicalLocation']['artifactLocation'][
-                                                                    'uri'] = '/' + loc['physicalLocation'][
-                                                                    'artifactLocation']['uri']
-                                                            if not loc['physicalLocation']['artifactLocation'][
-                                                                'uri'].startswith(f'/{project_name}'):
-                                                                loc['physicalLocation']['artifactLocation'][
-                                                                    'uri'] = f'/{project_name}' + loc['physicalLocation']['artifactLocation'][
-                                                                'uri']
+                                                            uri = clean_uri(uri, project_name, project_index)
+                                                            loc['physicalLocation']['artifactLocation']['uri'] = uri
+
                                                 else:
                                                     loc = location['location']
                                                     if 'physicalLocation' in loc and 'artifactLocation' in loc['physicalLocation']:
                                                         uri = loc['physicalLocation']['artifactLocation'].get('uri', '')
                                                         project_index = uri.find(project_name)
-                                                        if project_index != -1:
-                                                            loc['physicalLocation']['artifactLocation']['uri'] = '/' + uri[project_index:]
-                                                        if loc['physicalLocation']['artifactLocation'][
-                                                            'uri'].startswith('file://'):
-                                                            loc['physicalLocation']['artifactLocation']['uri'] = \
-                                                            loc['physicalLocation']['artifactLocation']['uri'][7:]
-                                                        if not (loc['physicalLocation']['artifactLocation'][
-                                                            'uri'].startswith('/')):
-                                                            loc['physicalLocation']['artifactLocation'][
-                                                                'uri'] = '/' + loc['physicalLocation'][
-                                                                'artifactLocation']['uri']
-                                                        if not loc['physicalLocation']['artifactLocation'][
-                                                            'uri'].startswith(f'/{project_name}'):
-                                                            loc['physicalLocation']['artifactLocation'][
-                                                                'uri'] = f'/{project_name}' + \
-                                                                         loc['physicalLocation']['artifactLocation'][
-                                                                             'uri']
+                                                        uri = clean_uri(uri, project_name, project_index)
+                                                        loc['physicalLocation']['artifactLocation']['uri'] = uri
 
     # Сохраняем изменения обратно в файл
     with open(filepath, 'w', encoding='utf-8') as file:
         json.dump(data, file, indent=2, ensure_ascii=False)
 
-def main(folder_path, projects_file):
-    # Считываем названия проектов из файла и сортируем по убыванию длины
-    with open(projects_file, 'r', encoding='utf-8') as file:
-        project_names = sorted([line.strip() for line in file.readlines()], key=len, reverse=True)
 
+def process_folder(folder_path, project_names):
     # Ищем все .sarif файлы в указанной папке
     sarif_files = glob.glob(os.path.join(folder_path, '*.sarif'))
 
@@ -101,7 +75,39 @@ def main(folder_path, projects_file):
                 process_sarif_file(sarif_file, project_name)
                 break
 
+
+def load_project_names(projects_file):
+    with open(projects_file, 'r', encoding='utf-8') as file:
+        return sorted([line.strip() for line in file.readlines()], key=len, reverse=True)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Process SARIF files to adjust URIs.")
+    parser.add_argument('--folder', type=str, default='../data/backup/',
+                        help="Path to the folder containing SARIF files.")
+    parser.add_argument('--file', type=str, help="Path to a single SARIF file.")
+    parser.add_argument('--project', type=str, help="Project name to be used directly.")
+    parser.add_argument('--projects_file', type=str, default='../projects.txt',
+                        help="Path to the file containing project names.")
+
+    args = parser.parse_args()
+
+    if args.project:
+        project_names = [args.project]
+    else:
+        project_names = load_project_names(args.projects_file)
+
+    if args.folder:
+        process_folder(args.folder, project_names)
+    elif args.file:
+        basename = os.path.basename(args.file)
+        for project_name in project_names:
+            if project_name in basename:
+                process_sarif_file(args.file, project_name)
+                break
+    else:
+        print("Either --folder or --file must be specified.")
+
+
 if __name__ == "__main__":
-    folder_path = '../data/backup'  # Укажите путь к папке с .sarif файлами
-    projects_file = '../projects.txt'  # Укажите путь к файлу с названиями проектов
-    main(folder_path, projects_file)
+    main()
