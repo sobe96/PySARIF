@@ -1,6 +1,5 @@
 # cli_interface.py
 import cli_options
-
 global dataframes
 
 

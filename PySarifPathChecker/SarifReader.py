@@ -97,16 +97,14 @@ def main():
     else:
         project_names = load_project_names(args.projects_file)
 
-    if args.folder:
-        process_folder(args.folder, project_names)
-    elif args.file:
+    if args.file:
         basename = os.path.basename(args.file)
         for project_name in project_names:
             if project_name in basename:
                 process_sarif_file(args.file, project_name)
                 break
     else:
-        print("Either --folder or --file must be specified.")
+        process_folder(args.folder, project_names)
 
 
 if __name__ == "__main__":
