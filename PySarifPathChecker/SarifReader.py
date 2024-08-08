@@ -5,18 +5,19 @@ import argparse
 
 
 def process_sarif_file(filepath, project_name):
+    print(filepath)
 
     def clean_uri(uri, project_name, project_index):
         if project_index != -1:
-            uri = '/' + uri[project_index:]
+            uri = uri[project_index + len(project_name):]
         # Убираем 'file://' в начале
         if uri.startswith('file://'):
             uri = uri[7:]
         # Добавляем '/' в начале, если нет
         if not uri.startswith('/'):
             uri = '/' + uri
-        if not uri.startswith(f'/{project_name}'):
-            uri = f'/{project_name}' + uri
+        #if not uri.startswith(f'/{project_name}'):
+        #    uri = f'/{project_name}' + uri
         return uri
 
     with open(filepath, 'r', encoding='utf-8') as file:
@@ -33,7 +34,7 @@ def process_sarif_file(filepath, project_name):
                                 uri = location['physicalLocation']['artifactLocation'].get('uri', '')
                                 project_index = uri.find(project_name)
                                 uri = clean_uri(uri, project_name, project_index)
-                                location['physicalLocation']['artifactLocation'] = uri
+                                location['physicalLocation']['artifactLocation']['uri'] = uri
 
                     if 'codeFlows' in result:
                         for code_flow in result['codeFlows']:
