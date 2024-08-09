@@ -14,6 +14,8 @@ def process_sarif_file(filepath, project_name):
         if uri.startswith('file://'):
             uri = uri[7:]
         # Добавляем '/' в начале, если нет
+        if uri.startswith('/svace/'):
+            uri = uri[6:]
         if not uri.startswith('/'):
             uri = '/' + uri
         #if not uri.startswith(f'/{project_name}'):
