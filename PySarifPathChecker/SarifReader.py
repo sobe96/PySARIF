@@ -18,8 +18,8 @@ def process_sarif_file(filepath, project_name):
             uri = uri[7:]
         if uri.startswith('/'):
             uri = uri[1:]
-        #if not uri.startswith(f'/{project_name}'):
-        #    uri = f'/{project_name}' + uri
+        if uri.startswith(':'):
+            uri = uri[1:]
         return uri
 
     with open(filepath, 'r', encoding='utf-8') as file:
