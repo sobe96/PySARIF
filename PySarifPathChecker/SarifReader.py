@@ -20,6 +20,9 @@ def process_sarif_file(filepath, project_name):
             uri = uri[1:]
         if uri.startswith(':'):
             uri = uri[1:]
+        if uri.startswith('fixedpath/'):
+            uri = uri[10:]
+        uri = '/' + uri.lstrip('/')
         return uri
 
     with open(filepath, 'r', encoding='utf-8') as file:
@@ -28,6 +31,22 @@ def process_sarif_file(filepath, project_name):
     # Проходим по всем результатам анализа и обрезаем пути
     if 'runs' in data:
         for run in data['runs']:
+            if 'artifacts' in run:
+                for artifact in run['artifacts']:
+                    if 'location' in artifact:
+                        if isinstance(artifact['location'], list):
+                            for loc in artifact['location']:
+                                uri = loc.get('uri', '')
+                                project_index = uri.find(project_name)
+                                uri = clean_uri(uri, project_name, project_index)
+                                loc['uri'] = uri
+
+                        else:
+                            loc = artifact['location']
+                            uri = loc.get('uri', '')
+                            project_index = uri.find(project_name)
+                            uri = clean_uri(uri, project_name, project_index)
+                            loc['uri'] = uri
             if 'results' in run:
                 for result in run['results']:
                     if 'locations' in result:
