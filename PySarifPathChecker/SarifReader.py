@@ -2,10 +2,12 @@ import os
 import json
 import glob
 import argparse
+import re
 
 
 def process_sarif_file(filepath, project_name):
     print(filepath)
+    gitleaks = False
 
     def clean_uri(uri, project_name, project_index):
         if project_index != -1:
@@ -31,6 +33,9 @@ def process_sarif_file(filepath, project_name):
     # Проходим по всем результатам анализа и обрезаем пути
     if 'runs' in data:
         for run in data['runs']:
+            if 'name' in run['tool']['driver'] and run['tool']['driver'].get('name', '') == 'gitleaks':
+                gitleaks = True
+                print('Gitleaks')
             if 'artifacts' in run:
                 for artifact in run['artifacts']:
                     if 'location' in artifact:
@@ -49,6 +54,11 @@ def process_sarif_file(filepath, project_name):
                             loc['uri'] = uri
             if 'results' in run:
                 for result in run['results']:
+                    if gitleaks and 'text' in result['message']:
+                        text = result['message'].get('text', '')
+                        text = re.sub(r' at commit [a-zA-Z0-9]+', '', text)
+                        result['message']['text'] = text
+                        print(text)
                     if 'locations' in result:
                         for location in result['locations']:
                             if 'physicalLocation' in location and 'artifactLocation' in location['physicalLocation']:
