@@ -65,12 +65,36 @@ python main.py
 - --folder: Путь к папке, содержащей .sarif файлы (по умолчанию ../data/backup).
 - --file: Путь к одному .sarif файлу.
 - --project: Имя проекта для использования напрямую.
-- --projects_file: Путь к файлу с названиями проектов (по умолчанию ../projects.txt, который необходимо заранее создать).
+- --projects_file: Путь к файлу с названиями проектов (по умолчанию ../projects.txt, который необходимо заранее создать и заполнить).
 ### Обработка в зависимости от аргументов:
 - Если указан --project, используется это имя проекта.
 - Если указан --projects_file, используются названия проектов внутри текстового файла с названиями проектов.
 - Если указан --folder, обрабатываются все файлы в папке.
 - Если указан --file, обрабатывается только этот файл.
 ```
-python SarifReader.py --project parsec --file parsec-svace-res.sarif
+python3 SarifReader.py --project project_name --file project_name-runner_name.sarif
+```
+# GetSarif
+## Описание
+Данный скрипт разработан для создания SARIF-файлов срабатываний Trufflehog или SonarQube.
+Для Trufflehog на вход подается JSON-отчет. Для SonarQube используется API SonarQube.
+## Использование
+### Запускаем скрипт с аргументами:
+- на данный момент mode может быть только sonar или trufflehog.
+- При создании SARIF из срабатываний SonarQube необходимо указать:
+  * --sonartoken: API-access токен для SonarQube (вида sqa_...).
+  * --sonarhost: URL SonarQube (http://sonarhost:port/)
+  * --taskid: TaskID из лога SonarQube (можно получить, например, вот так: TASK_ID=$(grep "ce/task?id" your_SonarQube_log.txt | cut -d "=" -f 2))
+- При создании SARIF из отчета Trufflehog необходимо указать:
+  * --data: Путь к JSON-отчету с результатами Trufflehog
+- --project: Название проекта для корректного создания имени SARIF (по умолчанию: unknown_project)
+- --runner: Название Gitlab runner'а для корректного создания имени SARIF (по умолчанию: unknown_runner)
+### Пример
+Для SonarQube
+```
+python3 get_sarif.py sonar --sonartoken sqa_token --sonarhost http://sonarhost:port/ --project project_name --taskid task_id-sonarqube --runner runner_name
+```
+Для Trufflehog
+```
+python3 get_sarif.py trufflehog --data path/to/trufflehog/report.json --project project_name --runner runner_name
 ```
