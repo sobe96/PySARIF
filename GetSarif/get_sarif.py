@@ -139,28 +139,24 @@ def trufflehog_data_add_to_sarif(issues):
     results = []
     for issue in issues:
         result = {
-            "results": [
+            "ruleId": issue["DetectorName"],
+            "message": {"text": issue["DetectorDescription"]},
+            "locations": [
                 {
-                    "ruleId": issue["DetectorName"],
-                    "message": {"text": issue["DetectorDescription"]},
-                    "locations": [
-                        {
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": issue["SourceMetadata"]["Data"]["Git"][
-                                        "file"
-                                    ]
-                                },
-                                "region": {
-                                    "startLine": issue["SourceMetadata"]["Data"][
-                                        "Git"
-                                    ]["line"],
-                                },
-                            }
-                        }
-                    ],
+                    "physicalLocation": {
+                        "artifactLocation": {
+                            "uri": issue["SourceMetadata"]["Data"]["Git"][
+                                "file"
+                            ]
+                        },
+                        "region": {
+                            "startLine": issue["SourceMetadata"]["Data"][
+                                "Git"
+                            ]["line"],
+                        },
+                    }
                 }
-            ],
+            ]
         }
         results.append(result)
 
