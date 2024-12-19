@@ -26,7 +26,8 @@ def parse_sonar(project_key, token, sonar_url):
         'components': project_key,
         'p': 1,
         'ps': page_size,
-        'impactSoftwareQualities': 'SECURITY, RELIABILITY'
+        'impactSoftwareQualities': 'SECURITY, RELIABILITY',
+        'resolved': 'false'
     }
 
     all_issues = []
