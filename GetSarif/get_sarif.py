@@ -18,12 +18,13 @@ def get_analysis_id(task_id, token, sonar_url):
     return None
 
 
-def parse_sonar(project_key, token, sonar_url):
+def parse_sonar(project_key, token, sonar_url, branch):
     """Парсинг данных из API SonarQube."""
     auth = (token, '')
     page_size = 500
     params = {
         'components': project_key,
+        'branch': branch,
         'p': 1,
         'ps': page_size,
         'impactSoftwareQualities': 'SECURITY, RELIABILITY',
@@ -195,6 +196,9 @@ def main():
     parser.add_argument(
         '--runner', type=str, help='Runner, используемый в GitLab для корректного создания имени SARIF'
     )
+    parser.add_argument(
+        '--branch', type=str, help='Имя ветки в GitLab для корректного создания имени SARIF'
+    )
     args = parser.parse_args()
 
     if args.runner:
@@ -213,6 +217,12 @@ def main():
     if args.mode == "sonar":
         sonar_token = args.sonartoken
         sonar_host = args.sonarhost
+        if args.branch:
+            branch = args.branch
+            print(f"Имя ветки: {branch}")
+        else:
+            branch = 'main'
+            print(f"Имя ветки не определено. Используется имя ветки: {branch}")
         if not sonar_token:
             print("Для режима 'sonar' необходимо указать --sonartoken.")
             sys.exit(1)
@@ -234,7 +244,7 @@ def main():
                     print("Анализ завершился неудачей. Завершение...")
                     sys.exit(1)
 
-            all_issues = parse_sonar(project_key, sonar_token, sonar_host)
+            all_issues = parse_sonar(project_key, sonar_token, sonar_host, branch)
             sarif, num_results = convert_to_sarif({'issues': all_issues}, args.mode)
 
             print(f'Количество результатов: {num_results}')
